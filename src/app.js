@@ -1,7 +1,19 @@
 const express = require("express");
+const {authMiddleWare} = require("./middlewares/auth");
 
 
 const app = express();
+
+app.use("/admin", authMiddleWare);
+
+//Middleware example
+app.use("/admin/addAdminUser", (req, res) => {
+    res.send("Admin added successfully")
+});
+
+app.use("/admin/deleteAdminUser", (req, res) => {
+    res.send("Admin deleted successfully")
+});
 
 app.use("/multiple-route", (req, res, next) => {
     console.log("handling first route")
