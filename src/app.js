@@ -3,8 +3,8 @@ const express = require("express");
 
 const app = express();
 
-app.get("/gethello", (req, res) => {
-    res.send("Hello from the server from get hello..... new udpate again and again")
+app.get("/hello", (req, res) => {
+    res.send("Hello from the server from hello route.....")
 })
 
 app.listen(5000, () => {
