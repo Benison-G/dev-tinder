@@ -8,6 +8,7 @@ const app = express();
 
 app.use(express.json());
 
+// Create an User
 app.post("/signup", async (req, res) => {
     const user = new User(req.body);
     try {
@@ -18,6 +19,16 @@ app.post("/signup", async (req, res) => {
     }
 });
 
+// Get all users
+app.get("/feed", async (req, res) => {
+    try {
+        const users = await User.find({})
+        res.send(users);
+    } catch (err) {
+        res.status(401).send("No users found");
+    }
+})
+
 // Get user by email ID
 app.get("/user", async (req, res) => {
     const emailId = req.body.email;
@@ -26,16 +37,6 @@ app.get("/user", async (req, res) => {
         res.send(users);
     } catch (err) {
         res.status(401).send("Could not find the user");
-    }
-})
-
-// Get all users
-app.get("/feed", async (req, res) => {
-    try {
-        const users = await User.find({})
-        res.send(users);
-    } catch (err) {
-        res.status(401).send("No users found");
     }
 })
 
@@ -51,15 +52,30 @@ app.delete("/user", async (req, res) => {
 })
 
 // Update an user
-app.patch("/user", async (req, res) => {
-    const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+    const userId = req.params.userId;
     const data = req.body;
+
     try {
-        const user = await User.findByIdAndUpdate({_id: userId }, data);
+        const ALLOWED_FIELDS = ["firstName", "lastName", "password", "photoURL", "about", "skills"];
+
+        const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_FIELDS.includes(k));
+        if (!isUpdateAllowed) {
+            throw new Error("Update not allowed");
+        }
+
+        const user = await User.findByIdAndUpdate(userId, data, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
         res.send("Updated the user successfully");
-    }
-    catch (err) {
-        res.status(500).send("Could not update");
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 })
 
