@@ -1,48 +1,34 @@
 const express = require("express");
-const {authMiddleWare} = require("./middlewares/auth");
+const { authMiddleWare } = require("./middlewares/auth");
+const connectToDB = require("./config/database");
 
+const User = require("./models/user");
 
 const app = express();
 
-app.use("/admin", authMiddleWare);
+app.post("/signup", async (req, res) => {
+    const user = new User({
+        firstName: "Nuthan",
+        lastName: "Mithra",
+        email: "nuthan.mithra@gmail.com",
+        password: "Nuthan@2022",
+        age: "4",
+        gender: "Male"
+    });
+    try {
+        await user.save();
+        res.send("User created successfully");
+    } catch(err) {
+        res.send("Could not added the user!!!")
+    }
+})
 
-//Middleware example
-app.use("/admin/addAdminUser", (req, res) => {
-    res.send("Admin added successfully")
+connectToDB().then(() => {
+    console.log("Connected to database successfully");
+    // This is to ensure DB connection before listening to the requests
+    app.listen(5000, () => {
+        console.log("Server is listening on port 5000...");
+    })
+}).catch((err) => {
+    console.error(err);
 });
-
-app.use("/admin/deleteAdminUser", (req, res) => {
-    res.send("Admin deleted successfully")
-});
-
-app.use("/multiple-route", (req, res, next) => {
-    console.log("handling first route")
-    next();
-}, (req, res) => {
-    console.log("handling second route")
-    res.send("Second response");
-})
-
-app.get("/hello", (req, res) => {
-    res.send("Hello from the server from hello route.....")
-})
-
-app.get("/user-with-query", (req, res) => {
-    res.json({ message: "Query param is", query: req.query });
-});
-
-app.get("/user-with-param/:userId", (req, res) => {
-    res.json({ message: "Route param is", param: req.params.userId });
-});
-
-app.get("/user", (req, res) => {
-    res.send({ firstName: "Nuthan", lastName: "Mithra" })
-})
-
-app.post("/user", (req, res) => {
-    res.send("Saved successfully");
-})
-
-app.listen(5000, () => {
-    console.log("Server is listening on port 5000...");
-})
