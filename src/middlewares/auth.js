@@ -1,9 +1,28 @@
-const authMiddleWare = (req, res, next) => {
-    const token = "abc";
-    if (token === "ab1c") {
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+const authMiddleWare = async (req, res, next) => {
+    try {
+        const cookie = req.cookies;
+        const { token } = cookie;
+        if (!token) {
+            throw new Error("Invalid token");
+        }
+        const decodedMessage = await jwt.verify(token, "NamastheBen@1991");
+        const { _id } = decodedMessage;
+
+        const user = await User.findOne({ _id: _id });
+
+        if (!user) {
+            throw new Error("User not found")
+        }
+
+        req.user = user;
+
         next();
-    } else {
-        res.status(401).send("Unauthorized");
+
+    } catch (err) {
+        res.status(500).send(err.message)
     }
 }
 

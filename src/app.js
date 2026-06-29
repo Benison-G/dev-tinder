@@ -52,9 +52,15 @@ app.post("/login", async (req, res) => {
             throw new Error("Invalid credentials");
         }
 
-        const token = jwt.sign({ _id: user._id }, "NamastheBen@1991");
 
-        res.cookie("token", token)
+        // Added expiry for token
+        const token = jwt.sign({ _id: user._id }, "NamastheBen@1991", { expiresIn: "1d" });
+
+        // Exprirse in a day and works for httpOnly
+        res.cookie("token", token, {
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            httpOnly: true
+        })
 
         res.send("Logged in successfully");
     } catch (err) {
@@ -62,21 +68,16 @@ app.post("/login", async (req, res) => {
     }
 })
 
-app.post("/profile", async (req, res) => {
+app.post("/profile", authMiddleWare, async (req, res) => {
     try {
-        const { token } = req.cookies;
-
-        const decodedMessage = await jwt.verify(token, "NamastheBen@1991")
-        const { _id } = decodedMessage;
-
-        const user = await User.findOne({ _id: _id });
-        if (!user) {
-            throw new Error("User not found");
-        }
-        res.send(user)
+        res.send(req.user)
     } catch (err) {
         res.status(500).send(err.message);
     }
+})
+
+app.post("/sendConnectRequest", authMiddleWare, async (req, res) => {
+    res.send("Connect sent")
 })
 
 // Get all users
