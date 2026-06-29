@@ -8,77 +8,16 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 
 const User = require("./models/user");
+const profileRouter = require("./routers/profileRouter");
+const authRouter = require("./routers/authRouter");
+const requestRouter = require("./routers/requestRouter");
 
 const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
 
-// Create an User
-app.post("/signup", async (req, res) => {
-    const user = new User(req.body);
-    try {
-        validateRequest(req);
-
-        const { firstName, lastName, email, password } = req.body;
-
-        // Encryption of password
-        const encryptedPassword = await bcrypt.hash(password, 10);
-        const user = new User({
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: encryptedPassword
-        });
-
-        await user.save();
-        res.send("User created successfully");
-    } catch (err) {
-        res.send(err.message)
-    }
-});
-
-app.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!validator.isEmail(email)) {
-            throw new Error("Invalid credentials")
-        }
-        const user = await User.findOne({ email: email });
-
-        const isValidUser = await user.validatePassword(password);
-
-        if (!isValidUser) {
-            throw new Error("Invalid credentials");
-        }
-
-
-        // Added expiry for token
-        const token = await user.getJWT();
-
-        // Exprirse in a day and works for httpOnly
-        res.cookie("token", token, {
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            httpOnly: true
-        })
-
-        res.send("Logged in successfully");
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-})
-
-app.post("/profile", authMiddleWare, async (req, res) => {
-    try {
-        res.send(req.user)
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-})
-
-app.post("/sendConnectRequest", authMiddleWare, async (req, res) => {
-    res.send("Connect sent")
-})
+app.use("/", authRouter, profileRouter, requestRouter);
 
 // Get all users
 app.get("/feed", async (req, res) => {
