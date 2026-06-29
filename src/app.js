@@ -4,11 +4,14 @@ const connectToDB = require("./config/database");
 const { validateRequest } = require("./utils/validateReq");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const User = require("./models/user");
 
 const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 
 // Create an User
@@ -43,14 +46,34 @@ app.post("/login", async (req, res) => {
         }
         const user = await User.findOne({ email: email });
 
-
         const isValidUser = await bcrypt.compare(password, user?.password);
 
         if (!isValidUser) {
             throw new Error("Invalid credentials");
         }
 
+        const token = jwt.sign({ _id: user._id }, "NamastheBen@1991");
+
+        res.cookie("token", token)
+
         res.send("Logged in successfully");
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+})
+
+app.post("/profile", async (req, res) => {
+    try {
+        const { token } = req.cookies;
+
+        const decodedMessage = await jwt.verify(token, "NamastheBen@1991")
+        const { _id } = decodedMessage;
+
+        const user = await User.findOne({ _id: _id });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        res.send(user)
     } catch (err) {
         res.status(500).send(err.message);
     }
