@@ -46,7 +46,7 @@ app.post("/login", async (req, res) => {
         }
         const user = await User.findOne({ email: email });
 
-        const isValidUser = await bcrypt.compare(password, user?.password);
+        const isValidUser = await user.validatePassword(password);
 
         if (!isValidUser) {
             throw new Error("Invalid credentials");
@@ -54,7 +54,7 @@ app.post("/login", async (req, res) => {
 
 
         // Added expiry for token
-        const token = jwt.sign({ _id: user._id }, "NamastheBen@1991", { expiresIn: "1d" });
+        const token = await user.getJWT();
 
         // Exprirse in a day and works for httpOnly
         res.cookie("token", token, {
