@@ -6,7 +6,7 @@ const authMiddleWare = async (req, res, next) => {
         const cookie = req.cookies;
         const { token } = cookie;
         if (!token) {
-            throw new Error("Invalid token");
+            throw new Error("Please login to access");
         }
         const decodedMessage = await jwt.verify(token, "NamastheBen@1991");
         const { _id } = decodedMessage;
