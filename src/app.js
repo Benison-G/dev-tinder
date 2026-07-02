@@ -11,13 +11,14 @@ const User = require("./models/user");
 const profileRouter = require("./routers/profileRouter");
 const authRouter = require("./routers/authRouter");
 const requestRouter = require("./routers/requestRouter");
+const userRouter = require("./routers/userRouter");
 
 const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
 
-app.use("/", authRouter, profileRouter, requestRouter);
+app.use("/", authRouter, profileRouter, requestRouter, userRouter);
 
 // Get all users
 app.get("/feed", async (req, res) => {
