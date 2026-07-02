@@ -9,7 +9,7 @@
  - PATCH /profile/password
 
 ## connectionRouter
- - POST /request/send/ineterest/:userId
+ - POST /request/send/interest/:userId
  - POST /request/send/ignored/:userId
  - POST /request/review/accepted/:requestId
  - POST /request/review/ignored/:requestId
