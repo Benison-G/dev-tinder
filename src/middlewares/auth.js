@@ -3,26 +3,26 @@ const User = require("../models/user");
 
 const authMiddleWare = async (req, res, next) => {
     try {
-        const cookie = req.cookies;
-        const { token } = cookie;
+        const { token } = req.cookies || {};
+
         if (!token) {
-            res.status(401).send("Please login");
+            return res.status(401).send("Please login");
         }
+
         const decodedMessage = await jwt.verify(token, "NamastheBen@1991");
         const { _id } = decodedMessage;
 
-        const user = await User.findOne({ _id: _id });
+        const user = await User.findOne({ _id });
 
         if (!user) {
-            throw new Error("User not found")
+            return res.status(401).send("Please login");
         }
 
         req.user = user;
 
-        next();
-
+        return next();
     } catch (err) {
-        res.status(500).send(err.message)
+        return res.status(401).send("Invalid or expired token");
     }
 }
 
