@@ -19,11 +19,14 @@ profileRouter.patch("/profile/edit", authMiddleWare, async (req, res) => {
         if (!validateProfileUpdateRequest(req)) {
             throw new Error("Cannot edit some fields")
         }
-        const loggedinUser = req.user;
-        Object.keys(req.body).forEach((k) => loggedinUser[k] = req.body[k]);
 
-        loggedinUser.save();
-        res.send("Profile updated successfully")
+        const loggedinUser = req.user;
+        Object.keys(req.body).forEach((k) => {
+            loggedinUser[k] = req.body[k];
+        });
+
+        await loggedinUser.save();
+        res.send(loggedinUser);
     } catch (err) {
         res.status(500).send(err.message);
     }

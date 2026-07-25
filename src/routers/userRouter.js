@@ -71,7 +71,7 @@ userRouter.get("/feed", authMiddleWare, async (req, res) => {
                 { _id: { $nin: Array.from(hideUsersFromFeed) } },
                 { _id: { $ne: loggedInUser._id } }
             ]
-        }).select("firstName lastName age gender skills").skip(skip).limit(limit);
+        }).select("firstName lastName age gender skills about photoURL").skip(skip).limit(limit);
 
         res.send({
             message: "Fetched feed successfully",
