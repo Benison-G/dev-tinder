@@ -13,8 +13,8 @@ const validateRequest = (req) => {
 };
 
 const validateProfileUpdateRequest = (req) => {
-    const { firstName, lastName, email, age, gender, photoURL, skills } = req.body;
-    const allowedFields = ["firstName", "lastName", "email", "age", "photoURL", "gender", "skills", "about"];
+    const { firstName, lastName, email, age, gender, photoURL, photoUrl, skills } = req.body;
+    const allowedFields = ["firstName", "lastName", "email", "age", "photoURL", "photoUrl", "gender", "skills", "about"];
 
     return Object.keys(req.body).every((k) => allowedFields.includes(k));
 }

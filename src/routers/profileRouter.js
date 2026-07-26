@@ -22,7 +22,8 @@ profileRouter.patch("/profile/edit", authMiddleWare, async (req, res) => {
 
         const loggedinUser = req.user;
         Object.keys(req.body).forEach((k) => {
-            loggedinUser[k] = req.body[k];
+            const fieldName = k === "photoUrl" ? "photoURL" : k;
+            loggedinUser[fieldName] = req.body[k];
         });
 
         await loggedinUser.save();
