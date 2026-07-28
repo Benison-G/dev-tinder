@@ -9,7 +9,7 @@ const authMiddleWare = async (req, res, next) => {
             return res.status(401).send("Please login");
         }
 
-        const decodedMessage = await jwt.verify(token, "NamastheBen@1991");
+        const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET_KEY);
         const { _id } = decodedMessage;
 
         const user = await User.findOne({ _id });

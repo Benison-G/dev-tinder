@@ -54,7 +54,7 @@ const userSchema = mongoose.Schema({
 
 userSchema.methods.getJWT = async function () {
     // user this keyword to refer the current instance
-    return await jwt.sign({ _id: this._id }, "NamastheBen@1991", { expiresIn: "1d" });
+    return await jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 };
 
 userSchema.methods.validatePassword = async function (password) {

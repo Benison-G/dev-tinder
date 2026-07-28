@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const { authMiddleWare } = require("./middlewares/auth");
 const connectToDB = require("./config/database");
