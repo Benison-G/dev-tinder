@@ -17,6 +17,7 @@ const userRouter = require("./routers/userRouter");
 const cors = require("cors");
 
 const app = express();
+require("./utils/cronjob");
 
 app.use(cors({
     origin: "http://localhost:5173",
