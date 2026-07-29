@@ -15,6 +15,8 @@ const authRouter = require("./routers/authRouter");
 const requestRouter = require("./routers/requestRouter");
 const userRouter = require("./routers/userRouter");
 const cors = require("cors");
+const http = require("http");   
+const { initializeSocket } = require("./utils/socket");
 
 const app = express();
 require("./utils/cronjob");
@@ -89,10 +91,14 @@ app.patch("/user/:userId", async (req, res) => {
     }
 })
 
+const server = http.createServer(app);
+
+initializeSocket(server);
+
 connectToDB().then(() => {
     console.log("Connected to database successfully");
     // This is to ensure DB connection before listening to the requests
-    app.listen(5000, () => {
+    server.listen(5000, () => {
         console.log("Server is listening on port 5000...");
     })
 }).catch((err) => {
